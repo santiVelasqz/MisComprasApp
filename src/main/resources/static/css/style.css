@@ -1,0 +1,241 @@
+/* Navbar personalizado */
+.navbar {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+}
+
+.navbar .nav-link {
+    color: white !important;
+    margin-left: 0.5rem;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.navbar .nav-link:hover {
+    color: #1b7c85 !important;   /* turquesa oscuro */
+    transform: translateY(-2px);
+}
+
+
+.navbar-brand {
+    font-weight: 700;
+    color: white !important;
+}
+
+.navbar-brand:hover {
+    color: #f1f1f1 !important;
+}
+
+
+/* ==== Fuente general ==== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* ==== Encabezado estilo hero ==== */
+.hero {
+    background: linear-gradient(rgba(44, 181, 190, 0.6), rgba(44, 181, 190, 0.6)),
+                url('https://source.unsplash.com/1600x900/?shopping,store') center/cover no-repeat;
+    color: white;
+    padding: 6rem 1rem;
+    text-align: center;
+}
+
+.hero h1 {
+    font-weight: 800;
+    font-size: 3.5rem;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+}
+
+/* ==== Tarjetas estilo WordPress ==== */
+.card-custom {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.05);
+    transition: all .3s ease-in-out;
+    text-align: center;
+    padding: 2rem;
+    background: white;
+}
+
+.card-custom:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 30px rgba(0,0,0,0.1);
+}
+
+.card-custom a {
+    text-decoration: none;
+    display: block;
+    font-weight: 600;
+    color: #2cb5be;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    transition: color 0.3s ease;
+}
+
+.card-custom a:hover,
+a:hover {
+    color: #1b7c85 !important;   /* turquesa oscuro */
+}
+
+
+/* ==== Footer ==== */
+footer {
+    background: #222;
+    color: #bbb;
+    padding: 2rem 0;
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 3rem;
+}
+
+/* ==== Estilos para tablas === */
+
+/* Estilo moderno para tablas */
+.table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 12px;
+    background: transparent;
+}
+
+.table-modern thead tr {
+    background-color: #2cb5be;
+    color: white;
+    box-shadow: 0 2px 8px rgba(44, 181, 190, 0.3);
+    border-radius: 12px;
+}
+
+.table-modern thead th {
+    padding: 12px 20px;
+    text-align: left;
+    font-weight: 700;
+    border: none;
+}
+
+.table-modern tbody tr {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.table-modern tbody tr:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(44, 181, 190, 0.25);
+}
+
+.table-modern tbody td {
+    padding: 16px 20px;
+    vertical-align: middle;
+    border: none;
+    color: #333;
+}
+
+.table-modern tbody tr td:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+
+.table-modern tbody tr td:last-child {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+/* Botón Buscar */
+.btn-search {
+    background-color: #2cb5be; /* Turquesa principal */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(44, 181, 190, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-search:hover {
+    background-color: #1b7c85; /* Turquesa oscuro */
+    box-shadow: 0 4px 12px rgba(27, 124, 133, 0.4);
+    color: white;
+}
+
+/* Botón Editar */
+.btn-edit {
+    background-color: #17a2b8; /* Turquesa */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(23,162,184,0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-edit:hover {
+    background-color: #1b7c85; /* Turquesa oscuro */
+    box-shadow: 0 4px 12px rgba(27, 124, 133, 0.4);
+    color: white !important; /* mantiene el texto visible como en el search */
+}
+
+
+/* Botón Borrar */
+.btn-delete {
+    background-color: #ff5722; /* Naranja intenso */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(255,87,34,0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-delete:hover {
+    background-color: #e64a19; /* Naranja más oscuro */
+    box-shadow: 0 4px 12px rgba(230,74,25,0.4);
+    color: white;
+}
+
+/* Botón Ver productos */
+.btn-view {
+    background-color: #20c997; /* Verde menta */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(32,201,151,0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+.btn-view:hover {
+    background-color: #198f77;
+    box-shadow: 0 4px 12px rgba(25,143,119,0.4);
+    color: white;
+}
+
+/* Formularios */
+form .form-label {
+    color: #333;
+}
+
+form .form-control {
+    border-radius: 8px;
+    box-shadow: none;
+    padding: 10px;
+}
+
+form .form-control:focus {
+    border-color: #2cb5be;
+    box-shadow: 0 0 0 0.2rem rgba(44,181,190,0.25);
+}
+
+
+
+

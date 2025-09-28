@@ -1,0 +1,9 @@
+<!-- fragments/footer.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <footer th:fragment="footer">
+        &copy; <span th:text="${#dates.format(today, 'yyyy')}"></span> GastoSmart. Todos los derechos reservados.
+    </footer>
+</body>
+</html>

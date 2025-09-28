@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorías | Marvel's Shop</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CSS personalizado -->
+    <link href="/css/style.css" rel="stylesheet">
+     <!-- Iconos de Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Hero de Categorías -->
+    <section class="hero" style="background-image: linear-gradient(rgba(44, 181, 190, 0.6), rgba(44, 181, 190, 0.6)), url('https://source.unsplash.com/1600x600/?categories,shopping');">
+        <h1>Categorías</h1>
+        <p>Gestiona y organiza tus categorías fácilmente</p>
+    </section>
+
+    <div class="container my-5">
+        <!-- Campo de búsqueda -->
+        <form class="row g-3 mb-4">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="searchInput" placeholder="Buscar categoría...">
+            </div>
+        </form>
+
+        <!-- Tabla de categorías -->
+        <div class="table-responsive shadow rounded">
+            <table id="categoriaTable" class="table-modern">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Modificar</th>
+                        <th>Borrar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="categoria : ${categorias}">
+                        <td th:text="${categoria.id}"></td>
+                        <td th:text="${categoria.nombre}"></td>
+                        <td>
+                            <a class="btn btn-sm btn-edit" th:href="@{'/modificar-categoria/' + ${categoria.id}}">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-delete" th:href="@{'/borrar-categoria/' + ${categoria.id}}">
+                                <i class="bi bi-trash"></i> Borrar
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(categorias)}">
+                        <td colspan="4" class="text-center">No hay datos</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+
+
+    <!-- Script de búsqueda AJAX -->
+    <script>
+        $(document).ready(function() {
+            $('#searchInput').on('input', function() {
+                var searchTerm = $(this).val();
+                $.ajax({
+                    url: '/search-categoria',
+                    data: { nombre: searchTerm },
+                    success: function(categorias) {
+                        var tableBody = $('#categoriaTable tbody');
+                        tableBody.empty();
+
+                        if (categorias.length === 0) {
+                            var emptyRow = '<tr><td colspan="4" class="text-center">No hay datos</td></tr>';
+                            tableBody.append(emptyRow);
+                        } else {
+                            $.each(categorias, function(i, categoria) {
+                                var row = '<tr>'
+                                    + '<td>' + categoria.id + '</td>'
+                                    + '<td>' + categoria.nombre + '</td>'
+                                    + '<td><a class="btn btn-sm btn-primary" href="/modificar-categoria/' + categoria.id + '">Editar</a></td>'
+                                    + '<td><a class="btn btn-sm btn-danger" href="/borrar-categoria/' + categoria.id + '">Borrar</a></td>'
+                                    + '</tr>';
+                                tableBody.append(row);
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error en la búsqueda:", error);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos de Supermercados | Marvel's Shop</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <!-- CSS personalizado -->
+    <link href="/css/style.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <!-- Hero tematizado -->
+    <section class="hero" style="background-image: linear-gradient(rgba(44,181,190,0.6), rgba(44,181,190,0.6)), url('https://source.unsplash.com/1600x600/?supermarket,products');">
+        <h1>Productos en Supermercados</h1>
+        <p>Consulta y gestiona productos con sus precios actuales en cada supermercado</p>
+    </section>
+
+    <div class="container my-5">
+        <!-- Campo oculto con ID del supermercado -->
+        <input type="hidden" id="superId" th:value="${supermercado.id}" />
+
+        <!-- Buscador -->
+        <form class="row g-3 mb-4">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="searchProductoSuperInput" placeholder="Buscar producto...">
+            </div>
+        </form>
+
+<!-- Mensajes flash -->
+<div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+<div th:if="${error}" class="alert alert-danger" th:text="${error}" id="backendErrorMsg" style="display:none;"></div>
+
+<!-- Tabla -->
+<div class="table-responsive shadow rounded">
+    <table id="productoSuperTable" class="table-modern">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Marca</th>
+                <th>Supermercado</th>
+                <th>Precio</th>
+                <th>Fecha</th>
+                <th>Modificar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ps : ${productosSuper}" th:attr="data-tiene-compras=${productosuperConCompras[ps.id]}">
+                <td th:text="${ps.id}"></td>
+                <td th:text="${ps.producto.nombre}"></td>
+                <td th:text="${ps.producto.categoria != null ? ps.producto.categoria.nombre : 'No hay categoria'}"></td>
+                <td th:text="${ps.producto.marca != null ? ps.producto.marca.nombre : 'No hay marca'}"></td>
+                <td th:text="${ps.supermercado != null ? ps.supermercado.nombre + ' (' + (ps.supermercado.ciudad != null ? ps.supermercado.ciudad : 'Sin ciudad') + ')' : 'No hay supermercado'}"></td>
+                <td th:text="${ps.precioActual != null ? ps.precioActual : 'Sin precio'}"></td>
+                <td th:text="${ps.fechaActual != null ? ps.fechaActual : 'Sin fecha'}"></td>
+                <td>
+                    <a class="btn btn-sm btn-edit btn-check-compras" th:href="@{'/modificar-producto-supermercado/' + ${ps.id}}">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                </td>
+                <td>
+                    <a class="btn btn-sm btn-delete btn-check-compras" th:href="@{'/borrar-producto-supermercado/' + ${ps.id}}">
+                        <i class="bi bi-trash"></i> Borrar
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(productosSuper)}">
+                <td colspan="9" class="text-center">No hay datos</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</div>
+
+<!-- Footer -->
+<div th:replace="~{fragments/footer :: footer}"></div>
+<script>
+$(document).ready(function() {
+
+    // Delegamos el click en la tabla para cualquier futuro .btn-check-compras
+    $('#productoSuperTable').on('click', '.btn-check-compras', function(e) {
+        const boton = $(this);
+        const fila = boton.closest('tr');
+        const tieneCompras = fila.attr('data-tiene-compras') === "true";
+        const esBorrar = boton.hasClass("btn-delete");
+
+        if (tieneCompras) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'Acción no permitida',
+                text: '⚠️ No puedes modificar o eliminar este producto porque tiene compras asociadas (debe de eliminar primero las compras asociadas a este producto).',
+                confirmButtonColor: '#2CB5BE',
+                confirmButtonText: 'Entendido'
+            });
+            return; // ¡No sigas!
+        }
+
+        if (esBorrar) {
+            e.preventDefault();
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esto hace que se pierda el historial de precios de este producto.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, borrar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = boton.attr("href");
+                }
+            });
+            return;
+        }
+        // Para editar, no se muestra confirmación y se sigue el enlace normalmente.
+    });
+
+    $('#searchProductoSuperInput').on('input', function() {
+        var searchTerm = $(this).val();
+        var superId = $('#superId').val();
+        $.ajax({
+            url: '/search-producto-supermercado',
+            data: { search: searchTerm, superId: superId },
+            success: function(productosSuper) {
+                var tableBody = $('#productoSuperTable tbody');
+                tableBody.empty();
+
+                if (productosSuper.length === 0) {
+                    tableBody.append('<tr><td colspan="9" class="text-center">No hay datos</td></tr>');
+                } else {
+                    $.each(productosSuper, function(i, ps) {
+                        var categoria = ps.producto && ps.producto.categoria ? ps.producto.categoria.nombre : 'No hay categoria';
+                        var marca = ps.producto && ps.producto.marca ? ps.producto.marca.nombre : 'No hay marca';
+                        var precio = ps.precioActual !== null ? ps.precioActual : 'Sin precio';
+                        var fecha = ps.fechaActual ? ps.fechaActual : 'Sin fecha';
+
+                        var supermercadoTexto = 'No hay supermercado';
+                        if (ps.supermercado) {
+                            var ciudad = ps.supermercado.ciudad ? ps.supermercado.ciudad : 'Sin ciudad';
+                            supermercadoTexto = ps.supermercado.nombre + ' (' + ciudad + ')';
+                        }
+
+                        var tieneComprasAttr = ps.tieneCompras ? 'data-tiene-compras="true"' : 'data-tiene-compras="false"';
+
+                        var row = '<tr ' + tieneComprasAttr + '>'
+                            + '<td>' + (ps.id || '') + '</td>'
+                            + '<td>' + (ps.producto ? ps.producto.nombre : '') + '</td>'
+                            + '<td>' + categoria + '</td>'
+                            + '<td>' + marca + '</td>'
+                            + '<td>' + supermercadoTexto + '</td>'
+                            + '<td>' + precio + '</td>'
+                            + '<td>' + fecha + '</td>'
+                            + '<td><a class="btn btn-sm btn-edit btn-check-compras" href="/modificar-producto-supermercado/' + (ps.id || '') + '"><i class="bi bi-pencil"></i> Editar</a></td>'
+                            + '<td><a class="btn btn-sm btn-delete btn-check-compras" href="/borrar-producto-supermercado/' + (ps.id || '') + '"><i class="bi bi-trash"></i> Borrar</a></td>'
+                            + '</tr>';
+                        tableBody.append(row);
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error en la búsqueda:", error);
+            }
+        });
+    });
+
+    // Mensaje del backend vía SweetAlert
+    const backendErrorDiv = document.querySelector('.alert-danger');
+    if (backendErrorDiv && backendErrorDiv.textContent.trim() !== "") {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Acción no permitida',
+            text: backendErrorDiv.textContent.trim(),
+            confirmButtonColor: '#2CB5BE',
+            confirmButtonText: 'Entendido'
+        });
+    }
+});
+</script>
+
+
+<!-- Script búsqueda AJAX 
+<script>
+    function engancharEventosBloqueo() {
+        document.querySelectorAll(".btn-check-compras").forEach(function(boton) {
+            boton.addEventListener("click", function(e) {
+                const fila = boton.closest("tr");
+                const tieneCompras = fila.getAttribute("data-tiene-compras") === "true";
+                if (tieneCompras) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Acción no permitida',
+                        text: '⚠️ No puedes modificar o eliminar este producto porque tiene compras asociadas.',
+                        confirmButtonColor: '#2CB5BE',
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            });
+        });
+    }
+
+    $(document).ready(function() {
+        // Engancha evento inicialmente
+        engancharEventosBloqueo();
+
+        $('#searchProductoSuperInput').on('input', function() {
+            var searchTerm = $(this).val();
+            var superId = $('#superId').val();
+            $.ajax({
+                url: '/search-producto-supermercado',
+                data: { search: searchTerm, superId: superId },
+                success: function(productosSuper) {
+                    var tableBody = $('#productoSuperTable tbody');
+                    tableBody.empty();
+
+                    if (productosSuper.length === 0) {
+                        tableBody.append('<tr><td colspan="9" class="text-center">No hay datos</td></tr>');
+                    } else {
+                        $.each(productosSuper, function(i, ps) {
+                            var categoria = ps.producto && ps.producto.categoria ? ps.producto.categoria.nombre : 'No hay categoria';
+                            var marca = ps.producto && ps.producto.marca ? ps.producto.marca.nombre : 'No hay marca';
+                            var precio = ps.precio !== null ? ps.precio : 'Sin precio';
+                            var fecha = ps.fecha ? ps.fecha : 'Sin fecha';
+
+                            var supermercadoTexto = 'No hay supermercado';
+                            if (ps.supermercado) {
+                                var ciudad = ps.supermercado.ciudad ? ps.supermercado.ciudad : 'Sin ciudad';
+                                supermercadoTexto = ps.supermercado.nombre + ' (' + ciudad + ')';
+                            }
+
+                            var tieneComprasAttr = ps.tieneCompras ? 'data-tiene-compras="true"' : 'data-tiene-compras="false"';
+
+                            var row = '<tr ' + tieneComprasAttr + '>'
+                                + '<td>' + (ps.id || '') + '</td>'
+                                + '<td>' + (ps.producto ? ps.producto.nombre : '') + '</td>'
+                                + '<td>' + categoria + '</td>'
+                                + '<td>' + marca + '</td>'
+                                + '<td>' + supermercadoTexto + '</td>'
+                                + '<td>' + precio + '</td>'
+                                + '<td>' + fecha + '</td>'
+                                + '<td><a class="btn btn-sm btn-edit btn-check-compras" href="/modificar-producto-supermercado/' + (ps.id || '') + '"><i class="bi bi-pencil"></i> Editar</a></td>'
+                                + '<td><a class="btn btn-sm btn-delete btn-check-compras" href="/borrar-producto-supermercado/' + (ps.id || '') + '"><i class="bi bi-trash"></i> Borrar</a></td>'
+                                + '</tr>';
+                            tableBody.append(row);
+                        });
+
+                        // Reenganchar eventos después de actualizar tabla
+                        engancharEventosBloqueo();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error en la búsqueda:", error);
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        engancharEventosBloqueo();
+
+        // Mostrar mensaje del backend con SweetAlert si existe
+        const backendErrorDiv = document.querySelector('.alert-danger');
+        if (backendErrorDiv && backendErrorDiv.textContent.trim() !== "") {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Acción no permitida',
+                text: backendErrorDiv.textContent.trim(),
+                confirmButtonColor: '#2CB5BE',
+                confirmButtonText: 'Entendido'
+            });
+        }
+    });
+</script>-->
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
