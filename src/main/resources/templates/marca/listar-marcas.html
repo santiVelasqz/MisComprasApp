@@ -35,47 +35,49 @@
         <p>Administra y organiza tus marcas de manera sencilla</p>
     </section>
 
-    <div class="container my-5">
-        <!-- Búsqueda -->
-        <form class="row g-3 mb-4">
-            <div class="col-md-6">
-                <input type="text" class="form-control" id="searchInput" placeholder="Buscar marca...">
-            </div>
-        </form>
+	<div class="container my-5">
+		<!-- Búsqueda -->
+		<form class="row g-3 mb-4">
+			<div class="col-md-6">
+				<input type="text" class="form-control" id="searchInput"
+					placeholder="Buscar marca...">
+			</div>
+		</form>
 
-        <!-- Tabla -->
-        <div class="table-responsive shadow rounded">
-            <table id="marcaTable" class="table-modern">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Modificar</th>
-                        <th>Eliminar</th>
+		<!-- Tabla -->
+		<div class="table-responsive shadow rounded">
+			<table id="marcaTable" class="table-modern">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Nombre</th>
+						<th>Modificar</th>
+						<th>Eliminar</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="marca : ${marcas}"
+						th:attr="data-tiene-productos=${marcasConProductos[marca.id]}">
+						<td th:text="${marca.id}"></td>
+						<td th:text="${marca.nombre}"></td>
+						<td><a class="btn btn-sm btn-edit"
+							th:href="@{'/modificar-marca/' + ${marca.id}}"> <i
+								class="bi bi-pencil"></i> Editar
+						</a></td>
+						<td><a class="btn btn-sm btn-delete"
+							th:href="@{'/borrar-marca/' + ${marca.id}}"> <i
+								class="bi bi-trash"></i> Borrar
+						</a></td>
+					</tr>
+					<tr th:if="${#lists.isEmpty(marcas)}">
+                        <td colspan="4" class="text-center">No hay marcas registradas</td>
                     </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="marca : ${marcas}"
-    th:attr="data-tiene-productos=${marcasConProductos[marca.id]}">
-    <td th:text="${marca.id}"></td>
-    <td th:text="${marca.nombre}"></td>
-    <td>
-        <a class="btn btn-sm btn-edit" th:href="@{'/modificar-marca/' + ${marca.id}}">
-            <i class="bi bi-pencil"></i> Editar
-        </a>
-    </td>
-    <td>
-        <a class="btn btn-sm btn-delete" th:href="@{'/borrar-marca/' + ${marca.id}}">
-            <i class="bi bi-trash"></i> Borrar
-        </a>
-    </td>
-</tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+				</tbody>
+			</table>
+		</div>
+	</div>
 
-    <!-- Footer -->
+	<!-- Footer -->
     <div th:replace="~{fragments/footer :: footer}"></div>
 
     <!-- Script búsqueda AJAX -->
@@ -130,7 +132,7 @@ $(document).ready(function() {
                 tableBody.empty();
 
                 if (marcas.length === 0) {
-                    tableBody.append('<tr><td colspan="4" class="text-center">No hay datos</td></tr>');
+                    tableBody.append('<tr><td colspan="4" class="text-center">No hay marcas registradas</td></tr>');
                 } else {
                     $.each(marcas, function(i, marca) {
                         // Marca debe venir con propiedad tieneProductos booleana desde backend

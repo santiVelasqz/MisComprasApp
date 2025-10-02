@@ -141,84 +141,7 @@ public class CompraController {
 	    public List<Compra> searchCompra(@RequestParam String search) {
 	        return compraService.searchCompra(search);
 	    }
-
-	    // ======= FORMULARIOS =======
-//	    @GetMapping("/formulario-compra")
-//	    public String formularioCompra(Model model) {
-//	        Compra compra = new Compra();
-//
-//	        PrecioProducto pp = new PrecioProducto();
-//	        pp.setProductoSupermercado(new ProductoSupermercado());
-//
-//	        compra.setPrecioProducto(pp);
-//
-//	        List<Producto> productos = productoService.mostrarProductos();
-//	        List<Producto> productosUnicos = productos.stream()
-//	                .collect(Collectors.collectingAndThen(
-//	                        Collectors.toMap(
-//	                                p -> p.getNombre() + "_" + (p.getMarca() != null ? p.getMarca().getNombre() : ""),
-//	                                p -> p,
-//	                                (p1, p2) -> p1
-//	                        ),
-//	                        m -> new ArrayList<>(m.values())
-//	                ));
-//
-//	        model.addAttribute("compra", compra);
-//	        model.addAttribute("productos", productosUnicos);
-//	        model.addAttribute("supermercados", supermercadoService.mostrarSupermercados());
-//	        return "/compra/formulario-compra";
-//	    }
-//	    @GetMapping("/formulario-compra")
-//	    public String formularioCompra(Model model) {
-//	        Compra compra = new Compra();
-//
-//	        PrecioProducto pp = new PrecioProducto();
-//	        pp.setProductoSupermercado(new ProductoSupermercado());
-//	        compra.setPrecioProducto(pp);
-//
-//	        List<Producto> productos = productoService.mostrarProductos();
-//	        List<Producto> productosUnicos = productos.stream()
-//	                .collect(Collectors.collectingAndThen(
-//	                        Collectors.toMap(
-//	                                p -> p.getNombre() + "_" + (p.getMarca() != null ? p.getMarca().getNombre() : ""),
-//	                                p -> p,
-//	                                (p1, p2) -> p1
-//	                        ),
-//	                        m -> new ArrayList<>(m.values())
-//	                ));
-//
-//	        model.addAttribute("compra", compra);
-//	        model.addAttribute("productos", productosUnicos);
-//	        model.addAttribute("supermercados", supermercadoService.mostrarSupermercados());
-//	        return "/compra/formulario-compra";
-//	    }
-//	    @GetMapping("/formulario-compra")
-//	    public String formularioCompra(@ModelAttribute Compra compra, Model model) {
-//	        if (compra == null || compra.getId() == null) {
-//	            compra = new Compra();
-//
-//	            PrecioProducto pp = new PrecioProducto();
-//	            pp.setProductoSupermercado(new ProductoSupermercado());
-//	            compra.setPrecioProducto(pp);
-//	        }
-//
-//	        List<Producto> productos = productoService.mostrarProductos();
-//	        List<Producto> productosUnicos = productos.stream()
-//	                .collect(Collectors.collectingAndThen(
-//	                        Collectors.toMap(
-//	                                p -> p.getNombre() + "_" + (p.getMarca() != null ? p.getMarca().getNombre() : ""),
-//	                                p -> p,
-//	                                (p1, p2) -> p1
-//	                        ),
-//	                        m -> new ArrayList<>(m.values())
-//	                ));
-//
-//	        model.addAttribute("compra", compra);
-//	        model.addAttribute("productos", productosUnicos);
-//	        model.addAttribute("supermercados", supermercadoService.mostrarSupermercados());
-//
-//	        return "/compra/formulario-compra";
-//	    }
+	    
 	    @GetMapping("/formulario-compra")
 	    public String formularioCompra(@ModelAttribute Compra compra, Model model) {
 	        if (compra == null || compra.getId() == null) {
@@ -266,6 +189,7 @@ public class CompraController {
 	            @ModelAttribute Compra compra,
 	            @RequestParam(required = false) Double precioManual,
 	            @RequestParam(required = false) Double precioUnitarioSeleccionado,
+	            @RequestParam(required = false) String origen,
 	            RedirectAttributes redirectAttrs) {
 
 	        try {
@@ -334,7 +258,11 @@ public class CompraController {
 	            compraService.guardarCompra(compraFinal);
 
 	            redirectAttrs.addFlashAttribute("success", "Compra guardada correctamente.");
-	            return "redirect:/compras";
+	            if ("filtros".equals(origen)) {
+	            	return "redirect:/compras-fecha?fecha=" + compra.getFechaCompra(); 
+	            } else {
+	                return "redirect:/compras";
+	            }
 
 	        } catch (IllegalStateException e) {
 	        	if (compra.getPrecioProducto() == null) {
@@ -352,7 +280,7 @@ public class CompraController {
 
 	    
 	    @GetMapping("/modificar-compra/{id}")
-	    public String modificarCompra(@PathVariable Long id, Model model) {
+	    public String modificarCompra(@PathVariable Long id, Model model, @RequestParam(required = false) String origen) {
 	        Compra compra = compraService.buscarCompraPorId(id);
 
 	        // Evitar NPE (por si no estaba inicializado)
@@ -378,6 +306,7 @@ public class CompraController {
 	                ));
 
 	        model.addAttribute("productos", productosUnicos);
+	        model.addAttribute("origen", origen != null ? origen : "general");
 	        model.addAttribute("supermercados", supermercadoService.mostrarSupermercados());
 
 	        return "/compra/formulario-compra";

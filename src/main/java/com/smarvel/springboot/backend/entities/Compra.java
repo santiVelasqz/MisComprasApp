@@ -3,6 +3,8 @@ package com.smarvel.springboot.backend.entities;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,6 +31,7 @@ public class Compra {
     @Column(precision = 10, scale = 2)
     private BigDecimal precioPagado; // opcional si quieres guardar redundancia
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate fechaCompra;
 
 	public Compra() {

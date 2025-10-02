@@ -58,8 +58,9 @@
 						<tr>
 							<th>Producto</th>
 							<th>Supermercado</th>
+							<th>Precio venta</th>
 							<th>Cantidad</th>
-							<th>Precio</th>
+							<th>Precio pagado</th>
 							<th>Fecha</th>
 							<th>Modificar</th>
 							<th>Borrar</th>
@@ -67,22 +68,52 @@
 					</thead>
 					<tbody>
 						<tr th:each="compra : ${comprafecha}">
+							<!-- Producto -->
 							<td
-								th:text="${compra.productoSupermercado != null && compra.productoSupermercado.producto != null 
-              								? compra.productoSupermercado.producto.nombre : 'Sin producto'}"></td>
+								th:text="${compra.precioProducto != null 
+                        && compra.precioProducto.productoSupermercado != null
+                        && compra.precioProducto.productoSupermercado.producto != null 
+                        ? compra.precioProducto.productoSupermercado.producto.nombre 
+                        : 'Sin producto'}">
+							</td>
+
+							<!-- Supermercado -->
 							<td
-								th:text="${compra.productoSupermercado != null && compra.productoSupermercado.supermercado != null 
-              								? compra.productoSupermercado.supermercado.nombre + ' (' + (compra.productoSupermercado.supermercado.ciudad != null 
-                  							? compra.productoSupermercado.supermercado.ciudad : 'Sin ciudad') + ')' : 'No hay supermercado'}"></td>
+								th:text="${compra.precioProducto != null 
+                        && compra.precioProducto.productoSupermercado != null
+                        && compra.precioProducto.productoSupermercado.supermercado != null
+                        ? compra.precioProducto.productoSupermercado.supermercado.nombre + 
+                          ' (' + (compra.precioProducto.productoSupermercado.supermercado.ciudad != null 
+                                ? compra.precioProducto.productoSupermercado.supermercado.ciudad 
+                                : 'Sin ciudad') + ')'
+                        : 'No hay supermercado'}">
+							</td>
+							<!-- Precio unitario -->
+							<td
+								th:text="${#numbers.formatDecimal(compra.precioProducto.precio, 1, 'COMMA', 2, 'POINT')} + ' €'"></td>
+
+							<!-- Cantidad -->
 							<td th:text="${compra.cantidad}"></td>
-							<td th:text="${compra.precio}"></td>
-							<td th:text="${compra.fecha}"></td>
+
+							<!-- Precio pagado -->
+							<td
+								th:text="${#numbers.formatDecimal(compra.precioPagado, 1, 'COMMA', 2, 'POINT')} + ' €'"></td>
+
+							<!-- Fecha -->
+							<td
+								th:text="${#temporals.format(compra.fechaCompra, 'dd/MM/yyyy')}"></td>
+
+							<!-- Modificar -->
 							<td><a class="btn btn-sm btn-edit"
-								th:href="@{'/modificar-compra/' + ${compra.id}}"><i
-									class="bi bi-pencil"></i> Editar</a></td>
+								th:href="@{/modificar-compra/{id}(id=${compra.id}, origen='filtros')}">
+									<i class="bi bi-pencil"></i> Editar
+							</a></td>
+
+							<!-- Eliminar -->
 							<td><a class="btn btn-sm btn-delete"
-								th:href="@{'/borrar-compra/' + ${compra.id}}"><i
-									class="bi bi-trash"></i> Borrar</a></td>
+								th:href="@{'/borrar-compra/' + ${compra.id}}"> <i
+									class="bi bi-trash"></i> Borrar
+							</a></td>
 						</tr>
 						<tr th:if="${#lists.isEmpty(comprafecha)}">
 							<td colspan="7" class="text-center">No hay compras

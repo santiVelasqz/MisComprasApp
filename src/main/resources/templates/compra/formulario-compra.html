@@ -44,6 +44,7 @@
                     <form th:action="@{/guardar-compra}" th:object="${compra}" method="post">
                         <!-- ID oculto -->
                         <input type="hidden" th:field="*{id}" />
+                        <input type="hidden" name="origen" th:value="${origen}" />
                         <p>Precio Unitario inicial: <span th:text="${precioUnitario}"></span></p>
 <p>Precio Total inicial: <span th:text="${precioTotal}"></span></p>
                         

@@ -65,7 +65,7 @@
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(categorias)}">
-                        <td colspan="4" class="text-center">No hay datos</td>
+                        <td colspan="4" class="text-center">No hay categorías registradas</td>
                     </tr>
                 </tbody>
             </table>
@@ -89,7 +89,7 @@
                         tableBody.empty();
 
                         if (categorias.length === 0) {
-                            var emptyRow = '<tr><td colspan="4" class="text-center">No hay datos</td></tr>';
+                            var emptyRow = '<tr><td colspan="4" class="text-center">No hay categorías registradas</td></tr>';
                             tableBody.append(emptyRow);
                         } else {
                             $.each(categorias, function(i, categoria) {

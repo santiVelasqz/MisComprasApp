@@ -159,7 +159,7 @@
 
         <!-- Modificar -->
         <td>
-            <a class="btn btn-sm btn-edit" th:href="@{'/modificar-compra/' + ${compra.id}}">
+            <a class="btn btn-sm btn-edit" th:href="@{/modificar-compra/{id}(id=${compra.id}, origen='general')}">
                 <i class="bi bi-pencil"></i> Editar
             </a>
         </td>
@@ -223,7 +223,7 @@
                                 + '<td>' + (compra.cantidad != null ? compra.cantidad : '') + '</td>'
                                 + '<td>' + (compra.precio != null ? compra.precio : '') + '</td>'
                                 + '<td>' + (compra.fecha != null ? compra.fecha : '') + '</td>'
-                                + '<td><a class="btn btn-sm btn-primary" href="/modificar-compra/' + compra.id + '"><i class="bi bi-pencil"></i> Editar</a></td>'
+                                + '<td><a class="btn btn-sm btn-primary" href="/modificar-compra/' + compra.id +'?origen=filtros"><i class="bi bi-pencil"></i> Editar</a></td>'
                                 + '<td><a class="btn btn-sm btn-danger" href="/borrar-compra/' + compra.id + '"><i class="bi bi-trash"></i> Borrar</a></td>'
                                 + '</tr>';
                             tableBody.append(row);

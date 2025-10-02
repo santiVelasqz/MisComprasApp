@@ -72,7 +72,7 @@
                 <td th:text="${ps.producto.categoria != null ? ps.producto.categoria.nombre : 'No hay categoria'}"></td>
                 <td th:text="${ps.producto.marca != null ? ps.producto.marca.nombre : 'No hay marca'}"></td>
                 <td th:text="${ps.supermercado != null ? ps.supermercado.nombre + ' (' + (ps.supermercado.ciudad != null ? ps.supermercado.ciudad : 'Sin ciudad') + ')' : 'No hay supermercado'}"></td>
-                <td th:text="${ps.precioActual != null ? ps.precioActual : 'Sin precio'}"></td>
+                <td th:text="${ps.precioActual != null ? ps.precioActual : 'Sin precio'}  + ' €'"></td>
                 <td th:text="${ps.fechaActual != null ? ps.fechaActual : 'Sin fecha'}"></td>
                 <td>
                     <a class="btn btn-sm btn-edit btn-check-compras" th:href="@{'/modificar-producto-supermercado/' + ${ps.id}}">
@@ -86,7 +86,7 @@
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(productosSuper)}">
-                <td colspan="9" class="text-center">No hay datos</td>
+                <td colspan="9" class="text-center">No hay productos registrados en este supermercado</td>
             </tr>
         </tbody>
     </table>
