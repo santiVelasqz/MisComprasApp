@@ -312,75 +312,17 @@ public class CompraController {
 	        return "/compra/formulario-compra";
 	    }
 
-
-
-//	    @PostMapping("/guardar-compra")
-//	    public String guardarCompra(@ModelAttribute Compra compra,
-//	                                @RequestParam(required = false) Double precioManual) {
-//
-//	        Long productoId = compra.getPrecioProducto()
-//	                                .getProductoSupermercado()
-//	                                .getProducto()
-//	                                .getId();
-//
-//	        Long supermercadoId = compra.getPrecioProducto()
-//	                                    .getProductoSupermercado()
-//	                                    .getSupermercado()
-//	                                    .getId();
-//
-//	        Compra compraFinal = (compra.getId() != null)
-//	                ? compraService.buscarCompraPorId(compra.getId())
-//	                : new Compra();
-//
-//	        // 1️⃣ Buscar o crear ProductoSupermercado
-//	        ProductoSupermercado ps = productoSupermercadoService
-//	                .buscarPorProductoYSupermercado(productoId, supermercadoId);
-//
-//	        if (ps == null) {
-//	            ps = new ProductoSupermercado();
-//	            ps.setProducto(productoService.buscarProductoPorId(productoId));
-//	            ps.setSupermercado(supermercadoService.buscarSupermercadoPorId(supermercadoId));
-//	            ps = productoSupermercadoService.guardarProductoSupermercado(ps);
-//	        }
-//
-//	        // 2️⃣ Buscar o crear PrecioProducto
-//	        PrecioProducto precioProducto = precioProductoService
-//	                .buscarPorProductoSupermercadoYFecha(ps.getId(), compra.getFechaCompra());
-//
-//	        if (precioProducto == null) {
-//	            precioProducto = new PrecioProducto();
-//	            precioProducto.setProductoSupermercado(ps);
-//	            precioProducto.setPrecio(precioManual != null ? precioManual : 0.0);
-//	            precioProducto.setFecha(compra.getFechaCompra());
-//	            precioProducto = precioProductoService.guardar(precioProducto);
-//	        }
-//
-//	        // 3️⃣ Asignar en la compra el precioProducto
-//	        compraFinal.setPrecioProducto(precioProducto);
-//	        compraFinal.setCantidad(compra.getCantidad());
-//	        compraFinal.setPrecioPagado(precioManual != null ? precioManual : precioProducto.getPrecio());
-//	        compraFinal.setFechaCompra(compra.getFechaCompra());
-//
-//	        // 4️⃣ Guardar la compra
-//	        compraService.guardarCompra(compraFinal);
-//
-//	        return "redirect:/compras";
-//	    }
-
-
-//	    @GetMapping("/modificar-compra/{id}")
-//	    public String modificarCompra(@PathVariable Long id, Model model) {
-//	        Compra compra = compraService.buscarCompraPorId(id);
-//	        model.addAttribute("compra", compra);
-//	        model.addAttribute("productos", productoService.mostrarProductos());
-//	        model.addAttribute("supermercados", supermercadoService.mostrarSupermercados());
-//	        return "/compra/formulario-compra";
-//	    }
-
 	    @GetMapping("/borrar-compra/{id}")
-	    public String borrarCompra(@PathVariable Long id) {
+	    public String borrarCompra(@PathVariable Long id, @RequestParam(required = false) String origen) {
+	    	 // Busca la compra original antes de borrar
+	        Compra compra = compraService.buscarCompraPorId(id);
+	        LocalDate fechaCompra = compra != null ? compra.getFechaCompra() : null;
 	        compraService.borrarCompra(id);
-	        return "redirect:/compras";
+	        if ("filtros".equals(origen) && fechaCompra != null) {
+	            return "redirect:/compras-fecha?fecha=" + fechaCompra;
+	        } else {
+	            return "redirect:/compras";
+	        }
 	    }
 
 }

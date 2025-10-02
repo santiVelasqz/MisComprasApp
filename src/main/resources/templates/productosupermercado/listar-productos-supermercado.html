@@ -61,7 +61,7 @@
                 <th>Supermercado</th>
                 <th>Precio</th>
                 <th>Fecha</th>
-                <th>Modificar</th>
+              <!--  <th>Modificar</th>--> 
                 <th>Eliminar</th>
             </tr>
         </thead>
@@ -74,11 +74,11 @@
                 <td th:text="${ps.supermercado != null ? ps.supermercado.nombre + ' (' + (ps.supermercado.ciudad != null ? ps.supermercado.ciudad : 'Sin ciudad') + ')' : 'No hay supermercado'}"></td>
                 <td th:text="${ps.precioActual != null ? ps.precioActual : 'Sin precio'}  + ' €'"></td>
                 <td th:text="${ps.fechaActual != null ? ps.fechaActual : 'Sin fecha'}"></td>
-                <td>
+               <!--  <td>
                     <a class="btn btn-sm btn-edit btn-check-compras" th:href="@{'/modificar-producto-supermercado/' + ${ps.id}}">
                         <i class="bi bi-pencil"></i> Editar
                     </a>
-                </td>
+                </td>--> 
                 <td>
                     <a class="btn btn-sm btn-delete btn-check-compras" th:href="@{'/borrar-producto-supermercado/' + ${ps.id}}">
                         <i class="bi bi-trash"></i> Borrar

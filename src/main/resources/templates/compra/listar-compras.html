@@ -166,10 +166,11 @@
 
         <!-- Eliminar -->
         <td>
-            <a class="btn btn-sm btn-delete" th:href="@{'/borrar-compra/' + ${compra.id}}">
-                <i class="bi bi-trash"></i> Borrar
-            </a>
-        </td>
+		    <a href="javascript:void(0)" class="btn btn-sm btn-delete"
+		       th:onclick="'confirmarEliminacion(' + ${compra.id} + ')'" >
+		        <i class="bi bi-trash"></i> Borrar
+		    </a>
+		</td>
     </tr>
 
     <!-- Si no hay compras -->
@@ -200,22 +201,21 @@
                         tableBody.append('<tr><td colspan="7" class="text-center">No hay compras registradas</td></tr>');
                     } else {
                         $.each(compras, function(i, compra) {
-                        	var producto = compra.precioProducto 
-                            && compra.precioProducto.productoSupermercado 
-                            && compra.precioProducto.productoSupermercado.producto
-                            ? compra.precioProducto.productoSupermercado.producto.nombre
-                            : 'Sin producto';
+                            var producto = compra.precioProducto 
+                                && compra.precioProducto.productoSupermercado 
+                                && compra.precioProducto.productoSupermercado.producto
+                                ? compra.precioProducto.productoSupermercado.producto.nombre
+                                : 'Sin producto';
 
-                        var supermercado = 'No hay supermercado';
-                        if (compra.precioProducto 
-                            && compra.precioProducto.productoSupermercado 
-                            && compra.precioProducto.productoSupermercado.supermercado) {
-                            var ciudad = compra.precioProducto.productoSupermercado.supermercado.ciudad
-                                ? compra.precioProducto.productoSupermercado.supermercado.ciudad
-                                : 'Sin ciudad';
-                            supermercado = compra.precioProducto.productoSupermercado.supermercado.nombre + ' (' + ciudad + ')';
-                        }
-
+                            var supermercado = 'No hay supermercado';
+                            if (compra.precioProducto 
+                                && compra.precioProducto.productoSupermercado 
+                                && compra.precioProducto.productoSupermercado.supermercado) {
+                                var ciudad = compra.precioProducto.productoSupermercado.supermercado.ciudad
+                                    ? compra.precioProducto.productoSupermercado.supermercado.ciudad
+                                    : 'Sin ciudad';
+                                supermercado = compra.precioProducto.productoSupermercado.supermercado.nombre + ' (' + ciudad + ')';
+                            }
 
                             var row = '<tr>'
                                 + '<td>' + producto + '</td>'
@@ -224,7 +224,7 @@
                                 + '<td>' + (compra.precio != null ? compra.precio : '') + '</td>'
                                 + '<td>' + (compra.fecha != null ? compra.fecha : '') + '</td>'
                                 + '<td><a class="btn btn-sm btn-primary" href="/modificar-compra/' + compra.id +'?origen=filtros"><i class="bi bi-pencil"></i> Editar</a></td>'
-                                + '<td><a class="btn btn-sm btn-danger" href="/borrar-compra/' + compra.id + '"><i class="bi bi-trash"></i> Borrar</a></td>'
+                                + '<td><a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="confirmarEliminacion(' + compra.id + ')"><i class="bi bi-trash"></i> Borrar</a></td>'
                                 + '</tr>';
                             tableBody.append(row);
                         });
@@ -237,6 +237,26 @@
         });
     });
 </script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmarEliminacion(id) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¡Esta acción no se puede deshacer!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, borrar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '/borrar-compra/' + id;
+        }
+    });
+}
+</script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

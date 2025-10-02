@@ -110,10 +110,15 @@
 							</a></td>
 
 							<!-- Eliminar -->
-							<td><a class="btn btn-sm btn-delete"
-								th:href="@{'/borrar-compra/' + ${compra.id}}"> <i
-									class="bi bi-trash"></i> Borrar
-							</a></td>
+							<td>
+  <a href="javascript:void(0)" 
+     class="btn btn-sm btn-delete"
+     th:onclick="'confirmarEliminacionConOrigen(' + ${compra.id} + ', \'filtros\')'">
+    <i class="bi bi-trash"></i> Borrar
+  </a>
+</td>
+
+							
 						</tr>
 						<tr th:if="${#lists.isEmpty(comprafecha)}">
 							<td colspan="7" class="text-center">No hay compras
@@ -353,6 +358,27 @@
 		</div>
 
 	</div>
+	
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function confirmarEliminacionConOrigen(id, origen) {
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¡Esta acción no se puede deshacer!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, borrar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Redirige a la URL con el parámetro origen
+            window.location.href = '/borrar-compra/' + id + '?origen=' + origen;
+        }
+    });
+}
+</script>
+	
 
 	<!-- Footer -->
 	<div th:replace="~{fragments/footer :: footer}"></div>
