@@ -44,7 +44,7 @@
 	</section>
 
 	<div class="container my-5">
-
+	<div id="mensajeSuccess" th:if="${success}" th:text="${success}" style="display:none;"></div>
 		<!-- Bloques de resultados -->
 		<div th:if="${comprafecha != null}" class="mb-4">
 			<h2 class="mb-3 text-secondary">Listado por fecha</h2>
@@ -111,13 +111,12 @@
 
 							<!-- Eliminar -->
 							<td>
-  <a href="javascript:void(0)" 
-     class="btn btn-sm btn-delete"
-     th:onclick="'confirmarEliminacionConOrigen(' + ${compra.id} + ', \'filtros\')'">
-    <i class="bi bi-trash"></i> Borrar
-  </a>
-</td>
-
+							  <a href="javascript:void(0)" 
+							     class="btn btn-sm btn-delete"
+							     th:onclick="'confirmarEliminacionConOrigen(' + ${compra.id} + ', \'filtros\')'">
+							    <i class="bi bi-trash"></i> Borrar
+							  </a>
+							</td>
 							
 						</tr>
 						<tr th:if="${#lists.isEmpty(comprafecha)}">
@@ -342,7 +341,7 @@
 							<td th:text="${compra.precio}"></td>
 							<td th:text="${compra.fecha}"></td>
 							<td><a class="btn btn-sm btn-edit"
-								th:href="@{'/modificar-compra/' + ${compra.id}}"><i
+								th:href="@{/modificar-compra/{id}(id=${compra.id}, origen='filtros')}"><i
 									class="bi bi-pencil"></i> Editar</a></td>
 							<td><a class="btn btn-sm btn-delete"
 								th:href="@{'/borrar-compra/' + ${compra.id}}"><i
@@ -362,6 +361,83 @@
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+$(document).ready(function() {
+    // Si existe mensaje de éxito, mostrarlo
+    const mensajeSuccessDiv = document.getElementById('mensajeSuccess');
+    if (mensajeSuccessDiv && mensajeSuccessDiv.textContent.trim() !== "") {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: mensajeSuccessDiv.textContent.trim(),
+            confirmButtonColor: '#2cb5be',
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
+    // Delegación para botón borrar, para que funcione también tras actualización AJAX
+    $('#compraTable').on('click', '.btn-delete', function(e) {
+        e.preventDefault();
+        const boton = $(this);
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: '¡Esta acción no se puede deshacer!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, borrar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            boton.blur();
+            if (result.isConfirmed) {
+                window.location.href = boton.attr('href');
+            }
+        });
+    });
+
+    // Búsqueda AJAX, actualizar tabla y conservar funcionalidad
+    $('#searchCompraInput').on('input', function() {
+        var searchTerm = $(this).val();
+        $.ajax({
+            url: '/search-compra',
+            data: { search: searchTerm },
+            success: function(compras) {
+                var tableBody = $('#compraTable tbody');
+                tableBody.empty();
+
+                if (compras.length === 0) {
+                    tableBody.append('<tr><td colspan="8" class="text-center">No hay compras registradas</td></tr>');
+                } else {
+                    $.each(compras, function(i, compra) {
+                        var producto = compra.producto ? compra.producto : 'Sin producto';
+                        var supermercado = compra.supermercado ? compra.supermercado : 'No hay supermercado';
+                        var precioVenta = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(compra.precioVenta) + ' €';
+                        var cantidad = compra.cantidad != null ? compra.cantidad : '';
+                        var precioPagado = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(compra.precioPagado) + ' €';
+                        var fecha = compra.fecha != null ? compra.fecha : '';
+
+                        // Decide si poner origen=filtros según tu lógica. Aquí ponemos siempre:
+                        var hrefEditar = '/modificar-compra/' + compra.id + '?origen=filtros';
+
+                        var row = '<tr>'
+                            + '<td>' + producto + '</td>'
+                            + '<td>' + supermercado + '</td>'
+                            + '<td>' + precioVenta + '</td>'
+                            + '<td>' + cantidad + '</td>'
+                            + '<td>' + precioPagado + '</td>'
+                            + '<td>' + fecha + '</td>'
+                            + '<td><a class="btn btn-sm btn-edit" href="' + hrefEditar + '"><i class="bi bi-pencil"></i> Editar</a></td>'
+                            + '<td><a class="btn btn-sm btn-delete" href="/borrar-compra/' + compra.id + '"><i class="bi bi-trash"></i> Borrar</a></td>'
+                            + '</tr>';
+                        tableBody.append(row);
+                    });
+                }
+            },
+            error: function() {
+                console.error("Error en la búsqueda");
+            }
+        });
+    });
+});
+
 function confirmarEliminacionConOrigen(id, origen) {
     Swal.fire({
         title: '¿Estás seguro?',

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.smarvel.springboot.backend.entities.Categoria;
 import com.smarvel.springboot.backend.repository.CategoriaRepository;
+import com.smarvel.springboot.backend.repository.ProductoRepository;
 import com.smarvel.springboot.backend.service.ICategoriaService;
 
 @Service
@@ -15,6 +16,8 @@ public class CategoriaServiceImpl implements ICategoriaService{
 	
 	@Autowired
 	CategoriaRepository categoriaRepository;
+	@Autowired
+	ProductoRepository productoRepository;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -49,6 +52,11 @@ public class CategoriaServiceImpl implements ICategoriaService{
 	public void borrarCategoria(Long id) {
 		categoriaRepository.deleteById(id);
 		
+	}
+	
+	@Transactional(readOnly = true)
+	public boolean tieneProductosAsociados(Long categoriaId) {
+	    return productoRepository.existsByCategoriaId(categoriaId);
 	}
 
 }

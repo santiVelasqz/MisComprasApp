@@ -41,7 +41,6 @@
 					placeholder="Buscar supermercados...">
 			</div>
 		</form>
-
 		<!-- Tabla -->
 		<div class="table-responsive shadow rounded">
 			<table id="supermercadoTable" class="table-modern">
@@ -91,11 +90,22 @@
 
 	<!-- Footer -->
     <div th:replace="~{fragments/footer :: footer}"></div>
-
+<div id="mensajeSuccess" th:if="${success}" th:text="${success}" style="display:none;"></div>
     <!-- Script búsqueda AJAX -->
         <!-- Script búsqueda AJAX -->
     <script>
     function engancharEventosBorrar() {
+    	// Mostrar SweetAlert si hay mensaje de éxito
+        const mensajeSuccessDiv = document.getElementById('mensajeSuccess');
+        if (mensajeSuccessDiv && mensajeSuccessDiv.textContent.trim() !== "") {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: mensajeSuccessDiv.textContent.trim(),
+                confirmButtonColor: '#2cb5be',
+                confirmButtonText: 'Aceptar'
+            }).then(() => mensajeSuccessDiv.remove()); // ← aquí va la línea
+        }
         document.querySelectorAll(".btn-check-compras").forEach(function(boton) {
             boton.addEventListener("click", function(e) {
                 const fila = boton.closest("tr");

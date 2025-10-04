@@ -46,8 +46,9 @@
         </form>
 
 <!-- Mensajes flash -->
-<div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
 <div th:if="${error}" class="alert alert-danger" th:text="${error}" id="backendErrorMsg" style="display:none;"></div>
+<div id="mensajeSuccess" th:if="${success}" th:text="${success}" style="display:none;"></div>
 
 <!-- Tabla -->
 <div class="table-responsive shadow rounded">
@@ -98,6 +99,17 @@
 <script>
 $(document).ready(function() {
 
+	// Mostrar SweetAlert si hay mensaje de éxito
+    const mensajeSuccessDiv = document.getElementById('mensajeSuccess');
+    if (mensajeSuccessDiv && mensajeSuccessDiv.textContent.trim() !== "") {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: mensajeSuccessDiv.textContent.trim(),
+            confirmButtonColor: '#2cb5be',
+            confirmButtonText: 'Aceptar'
+        });
+    }
     // Delegamos el click en la tabla para cualquier futuro .btn-check-compras
     $('#productoSuperTable').on('click', '.btn-check-compras', function(e) {
         const boton = $(this);
@@ -173,7 +185,7 @@ $(document).ready(function() {
                             + '<td>' + supermercadoTexto + '</td>'
                             + '<td>' + precio + '</td>'
                             + '<td>' + fecha + '</td>'
-                            + '<td><a class="btn btn-sm btn-edit btn-check-compras" href="/modificar-producto-supermercado/' + (ps.id || '') + '"><i class="bi bi-pencil"></i> Editar</a></td>'
+                           // + '<td><a class="btn btn-sm btn-edit btn-check-compras" href="/modificar-producto-supermercado/' + (ps.id || '') + '"><i class="bi bi-pencil"></i> Editar</a></td>'
                             + '<td><a class="btn btn-sm btn-delete btn-check-compras" href="/borrar-producto-supermercado/' + (ps.id || '') + '"><i class="bi bi-trash"></i> Borrar</a></td>'
                             + '</tr>';
                         tableBody.append(row);

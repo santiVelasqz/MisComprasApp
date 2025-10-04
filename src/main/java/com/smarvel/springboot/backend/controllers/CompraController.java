@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.smarvel.springboot.backend.dto.BuscarEntreFechasDTO;
+import com.smarvel.springboot.backend.dto.CompraDTO;
 import com.smarvel.springboot.backend.entities.Compra;
 import com.smarvel.springboot.backend.entities.PrecioProducto;
 import com.smarvel.springboot.backend.entities.Producto;
@@ -138,8 +139,8 @@ public class CompraController {
 	    // ======= BÚSQUEDA AJAX =======
 	    @GetMapping("/search-compra")
 	    @ResponseBody
-	    public List<Compra> searchCompra(@RequestParam String search) {
-	        return compraService.searchCompra(search);
+	    public List<CompraDTO> searchCompra(@RequestParam String search) {
+	        return compraService.searchCompra2(search);
 	    }
 	    
 	    @GetMapping("/formulario-compra")
@@ -313,11 +314,12 @@ public class CompraController {
 	    }
 
 	    @GetMapping("/borrar-compra/{id}")
-	    public String borrarCompra(@PathVariable Long id, @RequestParam(required = false) String origen) {
+	    public String borrarCompra(@PathVariable Long id, @RequestParam(required = false) String origen, RedirectAttributes redirectAttrs) {
 	    	 // Busca la compra original antes de borrar
 	        Compra compra = compraService.buscarCompraPorId(id);
 	        LocalDate fechaCompra = compra != null ? compra.getFechaCompra() : null;
 	        compraService.borrarCompra(id);
+	        redirectAttrs.addFlashAttribute("success", "Compra eliminada correctamente.");
 	        if ("filtros".equals(origen) && fechaCompra != null) {
 	            return "redirect:/compras-fecha?fecha=" + fechaCompra;
 	        } else {

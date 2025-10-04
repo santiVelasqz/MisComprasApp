@@ -115,6 +115,7 @@
             <thead>
                 <tr>
                     <th>Producto</th>
+                    <th>Marca</th>
                     <th>Supermercado</th>
                     <th>Precio venta</th>
                     <th>Cantidad</th>
@@ -134,6 +135,14 @@
                         ? compra.precioProducto.productoSupermercado.producto.nombre 
                         : 'Sin producto'}">
         </td>
+        <!-- Marca --> 
+<td th:text="${compra.precioProducto != null
+    && compra.precioProducto.productoSupermercado != null
+    && compra.precioProducto.productoSupermercado.producto != null
+    && compra.precioProducto.productoSupermercado.producto.marca != null
+    ? compra.precioProducto.productoSupermercado.producto.marca.nombre
+    : 'Sin marca'}">
+</td>
         
         <!-- Supermercado -->
         <td th:text="${compra.precioProducto != null 
@@ -184,10 +193,21 @@
 
 <!-- Footer -->
 <div th:replace="~{fragments/footer :: footer}"></div>
-
+ <div id="mensajeSuccess" th:if="${success}" th:text="${success}" style="display:none;"></div>
 <!-- Script búsqueda AJAX adaptado -->
 <script>
     $(document).ready(function() {
+    	  // Mostrar mensaje de éxito si existe
+        const mensajeSuccessDiv = document.getElementById('mensajeSuccess');
+        if (mensajeSuccessDiv && mensajeSuccessDiv.textContent.trim() !== "") {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: mensajeSuccessDiv.textContent.trim(),
+                confirmButtonColor: '#2cb5be',
+                confirmButtonText: 'Aceptar'
+            });
+        }
         $('#searchCompraInput').on('input', function() {
             var searchTerm = $(this).val();
             $.ajax({
@@ -200,34 +220,31 @@
                     if (compras.length === 0) {
                         tableBody.append('<tr><td colspan="7" class="text-center">No hay compras registradas</td></tr>');
                     } else {
-                        $.each(compras, function(i, compra) {
-                            var producto = compra.precioProducto 
-                                && compra.precioProducto.productoSupermercado 
-                                && compra.precioProducto.productoSupermercado.producto
-                                ? compra.precioProducto.productoSupermercado.producto.nombre
-                                : 'Sin producto';
+                    	function formatearEuro(numero) {
+                    	    if (numero == null) return '';
+                    	    return new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(numero) + ' €';
+                    	}
 
-                            var supermercado = 'No hay supermercado';
-                            if (compra.precioProducto 
-                                && compra.precioProducto.productoSupermercado 
-                                && compra.precioProducto.productoSupermercado.supermercado) {
-                                var ciudad = compra.precioProducto.productoSupermercado.supermercado.ciudad
-                                    ? compra.precioProducto.productoSupermercado.supermercado.ciudad
-                                    : 'Sin ciudad';
-                                supermercado = compra.precioProducto.productoSupermercado.supermercado.nombre + ' (' + ciudad + ')';
-                            }
+                    	$.each(compras, function(i, compra) {
+                    	    var producto = compra.producto ? compra.producto : 'Sin producto';
+                    	    var supermercado = compra.supermercado ? compra.supermercado : 'No hay supermercado';
+                    	    var precioVenta = formatearEuro(compra.precioVenta);
+                    	    var cantidad = compra.cantidad != null ? compra.cantidad : '';
+                    	    var precioPagado = formatearEuro(compra.precioPagado);
+                    	    var fecha = compra.fecha != null ? compra.fecha : '';
 
-                            var row = '<tr>'
-                                + '<td>' + producto + '</td>'
-                                + '<td>' + supermercado + '</td>'
-                                + '<td>' + (compra.cantidad != null ? compra.cantidad : '') + '</td>'
-                                + '<td>' + (compra.precio != null ? compra.precio : '') + '</td>'
-                                + '<td>' + (compra.fecha != null ? compra.fecha : '') + '</td>'
-                                + '<td><a class="btn btn-sm btn-primary" href="/modificar-compra/' + compra.id +'?origen=filtros"><i class="bi bi-pencil"></i> Editar</a></td>'
-                                + '<td><a class="btn btn-sm btn-danger" href="javascript:void(0)" onclick="confirmarEliminacion(' + compra.id + ')"><i class="bi bi-trash"></i> Borrar</a></td>'
-                                + '</tr>';
-                            tableBody.append(row);
-                        });
+                    	    var row = '<tr>'
+                    	        + '<td>' + producto + '</td>'
+                    	        + '<td>' + supermercado + '</td>'
+                    	        + '<td>' + precioVenta + '</td>'
+                    	        + '<td>' + cantidad + '</td>'
+                    	        + '<td>' + precioPagado + '</td>'
+                    	        + '<td>' + fecha + '</td>'
+                    	        + '<td><a class="btn btn-sm btn-edit" href="/modificar-compra/' + compra.id +'?origen=general"><i class="bi bi-pencil"></i> Editar</a></td>'
+                    	        + '<td><a class="btn btn-sm btn-delete" href="javascript:void(0)" onclick="confirmarEliminacion(' + compra.id + ')"><i class="bi bi-trash"></i> Borrar</a></td>'
+                    	        + '</tr>';
+                    	    tableBody.append(row);
+                    	});
                     }
                 },
                 error: function() {

@@ -2,12 +2,14 @@ package com.smarvel.springboot.backend.serviceImpl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.smarvel.springboot.backend.dto.CompraDTO;
 import com.smarvel.springboot.backend.entities.Compra;
 import com.smarvel.springboot.backend.repository.CompraRepository;
 import com.smarvel.springboot.backend.service.ICompraService;
@@ -29,6 +31,42 @@ public class CompraServiceImpl implements ICompraService{
 	@Transactional(readOnly = true)
 	public List<Compra> searchCompra(String search) {
 	    return compraRepository.findByPrecioProducto_ProductoSupermercado_Producto_NombreContainingIgnoreCaseOrPrecioProducto_ProductoSupermercado_Supermercado_NombreContainingIgnoreCase(search, search);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<CompraDTO> searchCompra2(String search) {
+	    List<Compra> comprasEncontradas = compraRepository.findByPrecioProducto_ProductoSupermercado_Producto_NombreContainingIgnoreCaseOrPrecioProducto_ProductoSupermercado_Supermercado_NombreContainingIgnoreCase(search, search);
+
+	    List<CompraDTO> resultado = new ArrayList<>();
+	    for (Compra c : comprasEncontradas) {
+	        CompraDTO dto = new CompraDTO();
+	        dto.setId(c.getId());
+	        dto.setProducto(
+	            c.getPrecioProducto() != null 
+	            && c.getPrecioProducto().getProductoSupermercado() != null 
+	            && c.getPrecioProducto().getProductoSupermercado().getProducto() != null 
+	                ? c.getPrecioProducto().getProductoSupermercado().getProducto().getNombre() 
+	                : "Sin producto"
+	        );
+	        dto.setSupermercado(
+	            c.getPrecioProducto() != null 
+	            && c.getPrecioProducto().getProductoSupermercado() != null
+	            && c.getPrecioProducto().getProductoSupermercado().getSupermercado() != null
+	                ? c.getPrecioProducto().getProductoSupermercado().getSupermercado().getNombre()
+	                : "No hay supermercado"
+	        );
+	        dto.setPrecioVenta(
+	        	    c.getPrecioProducto() != null
+	        	    ? c.getPrecioProducto().getPrecio()
+	        	    : null
+	        	);
+	        dto.setCantidad(c.getCantidad());
+	        dto.setPrecioPagado(c.getPrecioPagado());
+	        dto.setFecha(c.getFechaCompra() != null ? c.getFechaCompra().toString() : "");
+	        resultado.add(dto);
+	    }
+	    return resultado;
 	}
 
 	@Override

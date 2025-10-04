@@ -43,6 +43,7 @@
             </div>
         </form>
 
+			<div id="mensajeSuccess" th:if="${success}" th:text="${success}" style="display:none;"></div>
         <!-- Tabla -->
         <div class="table-responsive shadow rounded">
             <table id="productoTable" class="table-modern">
@@ -58,26 +59,27 @@
                 </thead>
                 <tbody>
 <tr th:each="producto : ${productos}"
-    th:attr="data-tiene-compras=${productosConCompras[producto.id]}">
+    th:attr="data-tiene-supermercado=${productosConSupermercado[producto.id]}">
     <td th:text="${producto.id}"></td>
     <td th:text="${producto.nombre}"></td>
     <td th:text="${producto.categoria != null ? producto.categoria.nombre : 'No hay categoria'}"></td>
     <td th:text="${producto.marca != null ? producto.marca.nombre : 'No hay marca'}"></td>
     <td>
         <a href="#" 
-           class="btn btn-sm btn-edit btn-check-compras"
-           th:attrappend="data-id=${producto.id}"
+           class="btn btn-sm btn-edit btn-check-productos"
+           
            th:href="@{'/modificar-producto/' + ${producto.id}}">
             <i class="bi bi-pencil"></i> Editar
         </a>
     </td>
     <td>
         <a href="#"
-           class="btn btn-sm btn-delete btn-check-compras"
-           th:attrappend="data-id=${producto.id}"
-           th:href="@{'/borrar-producto/' + ${producto.id}}">
-            <i class="bi bi-trash"></i> Borrar
-        </a>
+   class="btn btn-sm btn-delete btn-check-productos"  
+  
+   th:href="@{'/borrar-producto/' + ${producto.id}}">
+    <i class="bi bi-trash"></i> Borrar
+</a>
+
     </td>
 </tr>
 
@@ -95,78 +97,101 @@
     <!-- Script de búsqueda AJAX -->
  
 <script>
-    $(document).ready(function() {
-        $('#searchInput').on('input', function() {
-            var searchTerm = $(this).val();
-            $.ajax({
-                url: '/search-producto',
-                data: { search: searchTerm },
-                success: function(productos) {
-                    var tableBody = $('#productoTable tbody');
-                    tableBody.empty();
+function engancharEventosProducto() {
+    const mensajeSuccessDiv = document.getElementById('mensajeSuccess');
+    if (mensajeSuccessDiv && mensajeSuccessDiv.textContent.trim() !== "") {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: mensajeSuccessDiv.textContent.trim(),
+            confirmButtonColor: '#2cb5be',
+            confirmButtonText: 'Aceptar'
+        });
+    }
 
-                    if (productos.length === 0) {
-                        var emptyRow = '<tr><td colspan="6" class="text-center">No hay datos</td></tr>';
-                        tableBody.append(emptyRow);
-                    } else {
-                        $.each(productos, function(i, p) {
-                            var row = '<tr data-tiene-compras="' + p.tieneCompras + '">'
-                                + '<td>' + p.id + '</td>'
-                                + '<td>' + p.nombre + '</td>'
-                                + '<td>' + p.categoria + '</td>'
-                                + '<td>' + p.marca + '</td>'
-                                + '<td><a class="btn btn-sm btn-edit btn-check-compras" href="/modificar-producto/' + p.id + '"><i class="bi bi-pencil"></i> Editar</a></td>'
-                                + '<td><a class="btn btn-sm btn-delete btn-check-compras" href="/borrar-producto/' + p.id + '"><i class="bi bi-trash"></i> Borrar</a></td>'
-                                + '</tr>';
-                            tableBody.append(row);
-                        });
+    document.querySelectorAll(".btn-check-productos").forEach(function(boton) {
+       
 
-                        // Volver a enganchar eventos
-                        document.querySelectorAll(".btn-check-compras").forEach(function(boton) {
-                            boton.addEventListener("click", function(e) {
-                                const fila = boton.closest("tr");
-                                const tieneCompras = fila.getAttribute("data-tiene-compras") === "true";
-                                if (tieneCompras) {
-                                    e.preventDefault();
-                                    Swal.fire({
-                                        icon: 'warning',
-                                        title: 'Acción no permitida',
-                                        text: 'No puedes realizar esta acción porque este producto tiene compras registradas.',
-                                        confirmButtonText: 'Entendido',
-                                        confirmButtonColor: '#2cb5be'
-                                    });
-                                }
-                            });
-                        });
+        boton.addEventListener("click", function(e) {
+            const fila = boton.closest("tr");
+            const tieneSupermercado = fila.getAttribute("data-tiene-supermercado") === "true";
+
+            if (tieneSupermercado) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Acción no permitida',
+                    text: 'No puedes modificar o borrar este producto porque está asociado a un supermercado.',
+                    confirmButtonColor: '#2cb5be',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+
+            if (boton.classList.contains('btn-delete')) {
+                e.preventDefault();
+                const url = boton.getAttribute("href");
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Se eliminará el producto permanentemente.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, borrar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = url;
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error en la búsqueda:", error);
-                }
-            });
+                });
+            }
         });
     });
+}
 
-    // También para la primera carga
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll(".btn-check-compras").forEach(function(boton) {
-            boton.addEventListener("click", function(e) {
-                const fila = boton.closest("tr");
-                const tieneCompras = fila.getAttribute("data-tiene-compras") === "true";
+$(document).ready(function() {
 
-                if (tieneCompras) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Acción no permitida',
-                        text: 'No puedes realizar esta acción porque este producto tiene compras registradas.',
-                        confirmButtonText: 'Entendido',
-                        confirmButtonColor: '#2cb5be'
+    $('#searchInput').on('input', function() {
+        var searchTerm = $(this).val();
+        $.ajax({
+            url: '/search-producto',
+            data: { search: searchTerm },
+            success: function(productos) {
+                var tableBody = $('#productoTable tbody');
+                tableBody.empty();
+
+                if (productos.length === 0) {
+                    var emptyRow = '<tr><td colspan="6" class="text-center">No hay datos</td></tr>';
+                    tableBody.append(emptyRow);
+                } else {
+                    $.each(productos, function(i, p) {
+                        var tieneSupermercado = p.tieneSupermercado ? 'true' : 'false';
+                        var row = '<tr data-tiene-supermercado="' + tieneSupermercado + '">'
+                            + '<td>' + p.id + '</td>'
+                            + '<td>' + p.nombre + '</td>'
+                            + '<td>' + p.categoria + '</td>'
+                            + '<td>' + p.marca + '</td>'
+                            + '<td><a href="/modificar-producto/' + p.id + '" class="btn btn-sm btn-edit btn-check-productos"><i class="bi bi-pencil"></i> Editar</a></td>'
+                            + '<td><a href="/borrar-producto/' + p.id + '" class="btn btn-sm btn-delete btn-check-productos"><i class="bi bi-trash"></i> Borrar</a></td>'
+                            + '</tr>';
+                        tableBody.append(row);
                     });
                 }
-            });
+
+                engancharEventosProducto();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error en la búsqueda:", error);
+            }
         });
     });
+
+    // Enganchar eventos en la carga inicial de la página
+    engancharEventosProducto();
+});
+
+
 </script>
 
     <!-- Bootstrap JS -->

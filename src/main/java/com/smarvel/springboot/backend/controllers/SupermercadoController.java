@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.smarvel.springboot.backend.dto.SupermercadoConBorradoDTO;
 import com.smarvel.springboot.backend.dto.SupermercadoConComprasDTO;
@@ -81,8 +82,9 @@ public class SupermercadoController {
 	}
 	
 	@PostMapping("/guardar-supermercado")
-	public String guardarSupermercado(@ModelAttribute Supermercado supermercado) {
+	public String guardarSupermercado(@ModelAttribute Supermercado supermercado, RedirectAttributes redirectAttrs) {
 		supermercadoService.guardarSupermercado(supermercado);
+		redirectAttrs.addFlashAttribute("success", "Supermercado guardado correctamente.");
 		return "redirect:/supermercados";
 	}
 	
@@ -94,8 +96,9 @@ public class SupermercadoController {
 	}
 	
 	@GetMapping("/borrar-supermercado/{id}")
-	public String borrarSupermercado(@PathVariable Long id) {
+	public String borrarSupermercado(@PathVariable Long id, RedirectAttributes redirectAttrs) {
 		supermercadoService.borrarSupermercado(id);
+		redirectAttrs.addFlashAttribute("success", "Supermercado eliminado correctamente.");
 		return "redirect:/supermercados";
 	}
 	

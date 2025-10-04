@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.smarvel.springboot.backend.dto.CompraDTO;
 import com.smarvel.springboot.backend.entities.Compra;
 
 public interface ICompraService {
@@ -15,6 +16,7 @@ public interface ICompraService {
 	public List<Compra> mostrarComprasEntreFechas(LocalDate fecha1, LocalDate fecha2);
 	
 	public List<Compra> searchCompra(String search);
+	public List<CompraDTO> searchCompra2(String search);
 	
 	public Compra buscarCompraPorId(Long id);
 	

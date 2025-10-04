@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.smarvel.springboot.backend.dto.MarcaConProductosDTO;
 import com.smarvel.springboot.backend.entities.Marca;
@@ -57,8 +58,9 @@ public class MarcaController {
 	}
 	
 	@PostMapping("/guardar-marca")
-	public String guardarMarca(@ModelAttribute Marca marca) {
+	public String guardarMarca(@ModelAttribute Marca marca, RedirectAttributes redirectAttrs) {
 		marcaService.guardarMarca(marca);
+		redirectAttrs.addFlashAttribute("success", "Marca guardada correctamente.");
 		return "redirect:/marcas";
 	}
 	
@@ -71,8 +73,9 @@ public class MarcaController {
 	}
 	
 	@GetMapping("/borrar-marca/{id}")
-	public String borrarMarca(@PathVariable Long id) {
+	public String borrarMarca(@PathVariable Long id, RedirectAttributes redirectAttrs) {
 		marcaService.borrarMarca(id);
+		redirectAttrs.addFlashAttribute("success", "Marca eliminada correctamente.");
 		return "redirect:/marcas";
 	}
 

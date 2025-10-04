@@ -15,5 +15,7 @@ public interface ICategoriaService {
 	public Categoria guardarCategoria(Categoria categoria);
 	
 	public void borrarCategoria(Long id);
+	
+	public boolean tieneProductosAsociados(Long id);
 
 }

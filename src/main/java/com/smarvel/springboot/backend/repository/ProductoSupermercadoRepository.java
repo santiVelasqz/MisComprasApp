@@ -20,6 +20,7 @@ public interface ProductoSupermercadoRepository extends JpaRepository<ProductoSu
 
 	ProductoSupermercado findByProductoIdAndSupermercadoId(Long productoId, Long supermercadoId);
 	boolean existsBySupermercadoId(Long supermercadoId);
+	boolean existsByProductoId(Long producto);
 	
 	//List<ProductoSupermercado> searchPorNombreYSuper(Long supermercadoId, String nombre);
 	@Query("SELECT ps FROM ProductoSupermercado ps WHERE ps.supermercado.id = :supermercadoId AND LOWER(ps.producto.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")

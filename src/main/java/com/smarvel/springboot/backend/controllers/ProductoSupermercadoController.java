@@ -68,53 +68,6 @@ public class ProductoSupermercadoController {
 	        }
 	    }
 	    
-//	    @GetMapping("/formulario-producto-supermercado")
-//	    public String formularioProductoSupermercado(Model model) {
-//	        // Lista de productos y supermercados para los selects
-//	        List<Producto> productos = productoService.mostrarProductos();
-//	        List<Supermercado> supermercados = supermercadoService.mostrarSupermercados();
-//	        ProductoSupermercado productosSuper = new ProductoSupermercado();
-//	        model.addAttribute("productos", productos);
-//	        model.addAttribute("supermercados", supermercados);
-//	        model.addAttribute("productoSupermercado", productosSuper);
-//	        return "/productosupermercado/formulario-producto-supermercado";
-//	    }
-
-//	    @PostMapping("/guardar-producto-supermercado")
-//	    public String guardarProductoSupermercado(@ModelAttribute ProductoSupermercado productosSuper) {
-//	        productoSupermercadoService.guardarProductoSupermercado(productosSuper);
-//	        return "redirect:/supermercado/" + productosSuper.getSupermercado().getId() + "/productos";
-//	    }
-	    
-	    
-	
-
-	    
-//	    @GetMapping("/modificar-producto-supermercado/{id}")
-//	    public String modificarProductoSupermercado(@PathVariable Long id, Model model) {
-//	        
-//	        // 1️⃣ Buscar el PS en base de datos
-//	        ProductoSupermercado ps = productoSupermercadoService.buscarProductoSupermercadoPorId(id);
-//
-//	        // 2️⃣ Inicializar precio si no tiene ninguno
-//	        if (ps.getHistoricoPrecios().isEmpty()) {
-//	            ps.getHistoricoPrecios().add(new PrecioProducto());
-//	        }
-//
-//	        // 3️⃣ Obtener el precio actual (último del histórico)
-//	        PrecioProducto precioActual = ps.getHistoricoPrecios()
-//	                                        .get(ps.getHistoricoPrecios().size() - 1);
-//
-//	        // 4️⃣ Enviar datos a la vista
-//	        model.addAttribute("productoSupermercado", ps);
-//	        model.addAttribute("precioProducto", precioActual);
-//	        model.addAttribute("productos", productoService.mostrarProductos());
-//	        model.addAttribute("supermercados", supermercadoService.mostrarSupermercados());
-//
-//	        // 5️⃣ Renderizar formulario
-//	        return "productosupermercado/formulario-producto-supermercado";
-//	    }
-	    
 	    @PostMapping("/guardar-producto-supermercado")
 	    public String guardarProductoSupermercado(@ModelAttribute ProductoSupermercado formPS) {
 	        ProductoSupermercado ps;
@@ -170,18 +123,6 @@ public class ProductoSupermercadoController {
 	        model.addAttribute("supermercados", supermercadoService.mostrarSupermercados());
 	        return "productosupermercado/formulario-producto-supermercado";
 	    }
-
-
-
-
-	    
-//	    @GetMapping("/borrar-producto-supermercado/{id}")
-//	    public String borrarProductoSupermercado(@PathVariable Long id) {
-//	        ProductoSupermercado productoSuper = productoSupermercadoService.buscarProductoSupermercadoPorId(id);
-//	        Long supermercadoId = productoSuper.getSupermercado().getId();
-//	        productoSupermercadoService.borrarProductoSupermercado(id);
-//	        return "redirect:/supermercado/" + supermercadoId + "/productos";
-//	    }
 	    
 	    @GetMapping("/borrar-producto-supermercado/{id}")
 	    public String borrarProductoSupermercado(@PathVariable Long id, RedirectAttributes redirectAttrs) {

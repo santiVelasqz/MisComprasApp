@@ -18,6 +18,7 @@
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -37,7 +38,7 @@
                 <input type="text" class="form-control" id="searchInput" placeholder="Buscar categoría...">
             </div>
         </form>
-
+		<div id="mensajeSuccess" th:if="${success}" th:text="${success}" style="display:none;"></div>
         <!-- Tabla de categorías -->
         <div class="table-responsive shadow rounded">
             <table id="categoriaTable" class="table-modern">
@@ -50,16 +51,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr th:each="categoria : ${categorias}">
+                    <tr th:each="categoria : ${categorias}"
+                    th:attr="data-tiene-productos=${categoriaConProductos[categoria.id]}">
                         <td th:text="${categoria.id}"></td>
                         <td th:text="${categoria.nombre}"></td>
                         <td>
-                            <a class="btn btn-sm btn-edit" th:href="@{'/modificar-categoria/' + ${categoria.id}}">
+                            <a class="btn btn-sm btn-edit btn-check-productos" th:href="@{'/modificar-categoria/' + ${categoria.id}}">
                                 <i class="bi bi-pencil"></i> Editar
                             </a>
                         </td>
                         <td>
-                            <a class="btn btn-sm btn-delete" th:href="@{'/borrar-categoria/' + ${categoria.id}}">
+                            <a class="btn btn-sm btn-delete btn-check-productos" th:href="@{'/borrar-categoria/' + ${categoria.id}}">
                                 <i class="bi bi-trash"></i> Borrar
                             </a>
                         </td>
@@ -74,42 +76,127 @@
 
     <!-- Footer -->
 <div th:replace="~{fragments/footer :: footer}"></div>
+<div id="mensajeSuccess" th:text="${success}" style="display:none;"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Script de búsqueda AJAX -->
-    <script>
-        $(document).ready(function() {
-            $('#searchInput').on('input', function() {
-                var searchTerm = $(this).val();
-                $.ajax({
-                    url: '/search-categoria',
-                    data: { nombre: searchTerm },
-                    success: function(categorias) {
-                        var tableBody = $('#categoriaTable tbody');
-                        tableBody.empty();
+    <!-- Script de búsqueda AJAX y SweetAlert -->
+<script>
+function engancharEventosBorrarCategoria() {
+    // Primero remueve handlers anteriores
+    document.querySelectorAll(".btn-check-productos").forEach(function(boton) {
+        // Clonar el botón para remover todos los event listeners
+        var nuevoBoton = boton.cloneNode(true);
+        boton.parentNode.replaceChild(nuevoBoton, boton);
+    });
 
-                        if (categorias.length === 0) {
-                            var emptyRow = '<tr><td colspan="4" class="text-center">No hay categorías registradas</td></tr>';
-                            tableBody.append(emptyRow);
-                        } else {
-                            $.each(categorias, function(i, categoria) {
-                                var row = '<tr>'
-                                    + '<td>' + categoria.id + '</td>'
-                                    + '<td>' + categoria.nombre + '</td>'
-                                    + '<td><a class="btn btn-sm btn-primary" href="/modificar-categoria/' + categoria.id + '">Editar</a></td>'
-                                    + '<td><a class="btn btn-sm btn-danger" href="/borrar-categoria/' + categoria.id + '">Borrar</a></td>'
-                                    + '</tr>';
-                                tableBody.append(row);
-                            });
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Error en la búsqueda:", error);
-                    }
+    // Ahora agrega los nuevos eventos
+    document.querySelectorAll(".btn-check-productos").forEach(function(boton) {
+        boton.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const fila = boton.closest("tr");
+            const tieneProductos = fila.getAttribute("data-tiene-productos") === "true";
+            const url = boton.getAttribute("href");
+            const esEditar = boton.textContent.trim().includes('Editar');
+
+            console.log("Click detectado - Tiene productos:", tieneProductos, "Es editar:", esEditar);
+
+            if (tieneProductos) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No se puede ' + (esEditar ? 'editar' : 'borrar'),
+                    text: 'Esta categoría tiene productos asociados y no se puede ' + (esEditar ? 'editar' : 'eliminar') + '.',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#2cb5be'
                 });
+                return false;
+            }
+
+            // Si es editar y NO tiene productos, navegar directamente
+            if (esEditar) {
+                window.location.href = url;
+                return false;
+            }
+
+            // Si es borrar y NO tiene productos, mostrar confirmación
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción no se puede deshacer.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, borrar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
             });
+            
+            return false;
+        }, true); // true = useCapture
+    });
+}
+
+// Ejecutar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM cargado, enganchando eventos...");
+    
+    // Mostrar SweetAlert si hay mensaje de éxito
+    const mensajeSuccessDiv = document.getElementById('mensajeSuccess');
+    if (mensajeSuccessDiv && mensajeSuccessDiv.textContent.trim() !== "") {
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: mensajeSuccessDiv.textContent.trim(),
+            confirmButtonColor: '#2cb5be',
+            confirmButtonText: 'Aceptar'
         });
-    </script>
+    }
+    
+    // Engancha eventos iniciales
+    engancharEventosBorrarCategoria();
+
+    // Búsqueda AJAX
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value;
+            
+            fetch('/search-categoria?nombre=' + encodeURIComponent(searchTerm))
+                .then(response => response.json())
+                .then(categorias => {
+                    const tableBody = document.querySelector('#categoriaTable tbody');
+                    tableBody.innerHTML = '';
+
+                    if (categorias.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="4" class="text-center">No hay categorías registradas</td></tr>';
+                    } else {
+                        categorias.forEach(categoria => {
+                            const tieneProductos = categoria.tieneProductos ? 'true' : 'false';
+                            const row = `<tr data-tiene-productos="${tieneProductos}">
+                                <td>${categoria.id}</td>
+                                <td>${categoria.nombre}</td>
+                                <td><a class="btn btn-sm btn-edit btn-check-productos" href="/modificar-categoria/${categoria.id}"><i class="bi bi-pencil"></i> Editar</a></td>
+                                <td><a class="btn btn-sm btn-delete btn-check-productos" href="/borrar-categoria/${categoria.id}"><i class="bi bi-trash"></i> Borrar</a></td>
+                            </tr>`;
+                            tableBody.innerHTML += row;
+                        });
+                    }
+
+                    // Reenganchar eventos a botones nuevos
+                    engancharEventosBorrarCategoria();
+                })
+                .catch(error => {
+                    console.error("Error en la búsqueda:", error);
+                });
+        });
+    }
+});
+</script>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

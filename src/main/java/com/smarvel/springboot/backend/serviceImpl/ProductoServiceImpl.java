@@ -50,6 +50,11 @@ public class ProductoServiceImpl implements IProductoService{
 	@Override
 	@Transactional
 	public void borrarProducto(Long id) {
+		boolean tieneSupermercado = productoSupermercadoRepository.existsByProductoId(id);
+	    
+	    if(tieneSupermercado) {
+	        throw new IllegalStateException("No se puede borrar este producto porque está asociado a un supermercado.");
+	    }
 		productoRepository.deleteById(id);
 		
 	}
